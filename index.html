@@ -1,0 +1,1725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>NEXGEN AGRI - Smart Farm Command</title>
+  <link rel="icon" type="image/png" href="/logo.png" />
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet" />
+  
+  <!-- Google Material Symbols -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  
+  <!-- Tailwind CSS CDN with custom config matching Stitch Design System -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#003b1b",
+            "primary-container": "#14532d",
+            "on-primary": "#ffffff",
+            "on-primary-container": "#87c695",
+            "primary-fixed": "#b1f2be",
+            "primary-fixed-dim": "#96d5a3",
+            "secondary": "#006d30",
+            "secondary-container": "#92f5a4",
+            "on-secondary": "#ffffff",
+            "on-secondary-container": "#007233",
+            "secondary-fixed": "#95f8a7",
+            "tertiary": "#003553",
+            "tertiary-container": "#004c75",
+            "on-tertiary": "#ffffff",
+            "on-tertiary-container": "#6cbeff",
+            "tertiary-fixed": "#cce5ff",
+            "tertiary-fixed-dim": "#93ccff",
+            "surface": "#f8f9ff",
+            "surface-dim": "#ccdbf3",
+            "surface-bright": "#f8f9ff",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#eff4ff",
+            "surface-container": "#e6eeff",
+            "surface-container-high": "#dce9ff",
+            "surface-container-highest": "#d5e3fc",
+            "on-surface": "#0d1c2e",
+            "on-surface-variant": "#404941",
+            "outline": "#717970",
+            "outline-variant": "#c0c9be",
+            "error": "#ba1a1a",
+            "error-container": "#ffdad6",
+            "on-error": "#ffffff",
+            "on-error-container": "#93000a"
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+            inter: ['Inter', 'sans-serif']
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body class="bg-[#0b0f17] text-on-surface antialiased select-none">
+
+  <!-- Device Frame Simulator Wrapper -->
+  <div class="device-wrapper" id="device-wrapper">
+    <div class="mobile-phone-shell" id="mobile-shell">
+      
+      <!-- Top Dynamic Island & Notch -->
+      <div class="phone-notch">
+        <div class="phone-camera-lens"></div>
+        <div class="phone-speaker"></div>
+        <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+      </div>
+
+      <!-- Phone Status Bar -->
+      <div class="phone-status-bar">
+        <span id="status-time">08:42</span>
+        <div class="flex items-center gap-1.5 text-[14px]">
+          <span class="text-[10px] font-mono text-emerald-700 dark:text-emerald-400 font-bold bg-emerald-100 dark:bg-emerald-950/60 px-1 rounded">LoRa</span>
+          <span class="material-symbols-outlined text-[14px]">signal_cellular_alt</span>
+          <span class="material-symbols-outlined text-[14px]">wifi</span>
+          <span class="material-symbols-outlined text-[16px]">battery_5_bar</span>
+        </div>
+      </div>
+
+      <!-- Global App Header (Hidden on Login Screen) -->
+      <header id="global-header" class="hidden shrink-0 bg-surface/90 backdrop-blur-xl border-b border-outline-variant/30 px-3.5 pt-1 pb-2 z-40">
+        <div class="flex items-center justify-between gap-2">
+          <!-- Logo & Title -->
+          <div class="flex items-center gap-2 min-w-0 cursor-pointer" onclick="navigateTo('dashboard')">
+            <div class="w-8 h-8 rounded-xl overflow-hidden shadow-sm flex items-center justify-center shrink-0 border border-emerald-500/40 bg-white p-0.5">
+              <img src="/logo.png" alt="NEXGEN AGRI Logo" class="w-full h-full object-contain rounded-lg" />
+            </div>
+            <div class="flex flex-col truncate">
+              <span class="font-extrabold text-primary text-[15px] tracking-tight leading-none">NEXGEN <span class="text-secondary font-bold">AGRI</span></span>
+              <span class="text-[10px] text-on-surface-variant font-medium truncate" id="header-subtitle">Edge Gateway #09</span>
+            </div>
+          </div>
+
+          <!-- Actions: Language, Notifications, Farmer Avatar -->
+          <div class="flex items-center gap-1.5 shrink-0">
+            <!-- Language Pill Toggle -->
+            <div class="flex items-center bg-surface-container rounded-full p-0.5 text-on-surface-variant shadow-inner">
+              <button class="lang-switch-btn px-2 py-0.5 rounded-full text-[11px] font-bold bg-primary text-on-primary min-h-[22px] transition-all" data-lang="en">EN</button>
+              <button class="lang-switch-btn px-1.5 py-0.5 rounded-full text-[11px] text-on-surface-variant min-h-[22px] transition-all" data-lang="hi">हिं</button>
+              <button class="lang-switch-btn px-1.5 py-0.5 rounded-full text-[11px] text-on-surface-variant min-h-[22px] transition-all" data-lang="te">తె</button>
+            </div>
+
+            <!-- Notifications Button -->
+            <button id="notif-btn" class="relative w-8 h-8 flex items-center justify-center text-on-surface rounded-full hover:bg-surface-container transition-colors">
+              <span class="material-symbols-outlined text-[20px]">notifications</span>
+              <span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full ring-2 ring-surface"></span>
+            </button>
+
+            <!-- Profile Avatar -->
+            <button id="profile-btn" class="w-8 h-8 rounded-full overflow-hidden ring-2 ring-secondary/30 hover:opacity-90">
+              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80" alt="Farmer Ramesh" class="w-full h-full object-cover" />
+            </button>
+          </div>
+        </div>
+
+        <!-- Subheader: Farm Location & Live NPU status -->
+        <div class="flex items-center justify-between gap-2 pt-1.5">
+          <button id="farm-selector-btn" class="flex items-center gap-1 bg-surface-container-lowest/90 px-2 py-0.5 rounded-full text-on-surface hover:bg-surface-container transition-colors max-w-[62%] text-[11px] font-semibold border border-outline-variant/30 truncate">
+            <span class="material-symbols-outlined text-secondary text-[14px]">location_on</span>
+            <span class="truncate" id="current-farm-name">Green Acres Farm #4 (Punjab)</span>
+            <span class="material-symbols-outlined text-outline text-[14px]">expand_more</span>
+          </button>
+          
+          <div class="flex items-center gap-1 bg-secondary-container/40 px-2 py-0.5 rounded-full text-[10px] text-on-secondary-container font-bold tracking-wide">
+            <span class="relative flex h-1.5 w-1.5">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-secondary"></span>
+            </span>
+            <span>EDGE AI ACTIVE</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Scrollable Screen Content Container -->
+      <main class="screen-scroll-container no-scrollbar" id="screen-viewport">
+
+        <!-- ========================================== -->
+        <!-- SCREEN 1: FARMER & EDGE DEVICE LOGIN SCREEN -->
+        <!-- ========================================== -->
+        <section id="screen-login" class="flex flex-col w-full p-4 pt-2">
+          
+          <!-- Top Telemetry Pill & Language Switcher -->
+          <div class="flex items-center justify-between pb-3">
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-container/30 text-on-secondary-container">
+              <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-secondary"></span>
+              </span>
+              <span class="text-[10px] font-bold tracking-wider uppercase" data-i18n="mesh_sync">MESH NODE SYNC ACTIVE</span>
+            </div>
+            
+            <div class="flex items-center bg-surface-container rounded-full p-0.5 shadow-sm">
+              <button class="lang-switch-btn px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary text-on-primary transition-all" data-lang="en">EN</button>
+              <button class="lang-switch-btn px-2.5 py-0.5 rounded-full text-xs text-on-surface-variant transition-all" data-lang="hi">हिंदी</button>
+              <button class="lang-switch-btn px-2.5 py-0.5 rounded-full text-xs text-on-surface-variant transition-all" data-lang="te">తెలుగు</button>
+            </div>
+          </div>
+
+          <!-- Brand Identification Block -->
+          <div class="flex flex-col items-center text-center mt-2 mb-5">
+            <div class="relative group cursor-pointer mb-2.5">
+              <div class="absolute -inset-2 bg-gradient-to-r from-secondary-fixed via-primary-fixed to-secondary-container rounded-3xl blur-md opacity-40 group-hover:opacity-70 transition duration-500"></div>
+              <div class="relative w-20 h-20 rounded-3xl bg-surface-container-lowest p-2 shadow-xl flex items-center justify-center border-2 border-emerald-500/30 overflow-hidden">
+                <img src="/logo.png" alt="NEXGEN AGRI Leaf Circuit Logo" class="w-full h-full object-contain rounded-2xl" />
+              </div>
+            </div>
+            <h1 class="font-extrabold text-2xl text-primary tracking-tight leading-tight" data-i18n="app_title">NEXGEN AGRI</h1>
+            <p class="text-xs text-on-surface-variant mt-0.5 font-medium" data-i18n="app_tagline">AI-Powered Farm & Edge Node Gateway</p>
+            
+            <div class="mt-2 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant text-[11px] font-mono">
+              <span class="material-symbols-outlined text-[13px] text-secondary">sensors</span>
+              <span data-i18n="terminal_id">Terminal ID: PB-FEROZE-EDG-09</span>
+            </div>
+          </div>
+
+          <!-- Authentication Card -->
+          <div class="w-full bg-surface-container-lowest rounded-2xl p-4 sm:p-5 shadow-md border border-outline-variant/30 flex flex-col gap-4">
+            <div class="flex flex-col gap-0.5">
+              <div class="flex items-center justify-between">
+                <h2 class="font-bold text-base text-on-surface" data-i18n="gateway_access">Gateway Access</h2>
+                <span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant text-[10px] font-mono font-bold" data-i18n="version_edge">v4.8 Edge</span>
+              </div>
+              <p class="text-xs text-on-surface-variant" data-i18n="gateway_desc">
+                Authenticate your terminal to command field telemetry, smart pumps, and real-time pest vision models.
+              </p>
+            </div>
+
+            <!-- Login Form -->
+            <form class="flex flex-col gap-3.5" id="login-form">
+              <!-- Farmer ID -->
+              <div class="flex flex-col gap-1">
+                <label class="text-xs font-semibold text-on-surface flex items-center gap-1.5" for="input-farmer-id">
+                  <span class="material-symbols-outlined text-[16px] text-secondary">badge</span>
+                  <span data-i18n="farmer_id_label">Farmer ID / Mobile Number</span>
+                </label>
+                <div class="relative flex items-center">
+                  <input class="w-full bg-surface-container-low text-on-surface text-sm rounded-xl px-3.5 py-2.5 pl-9 border border-transparent focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all font-medium" id="input-farmer-id" type="text" value="RP-7492-PB" required />
+                  <span class="material-symbols-outlined absolute left-2.5 text-on-surface-variant text-[18px]">account_circle</span>
+                  <span class="material-symbols-outlined absolute right-3 text-secondary text-[18px]">check_circle</span>
+                </div>
+              </div>
+
+              <!-- Edge Node ID -->
+              <div class="flex flex-col gap-1">
+                <div class="flex items-center justify-between">
+                  <label class="text-xs font-semibold text-on-surface flex items-center gap-1.5" for="input-node-id">
+                    <span class="material-symbols-outlined text-[16px] text-secondary">router</span>
+                    <span data-i18n="node_id_label">Farm Edge Device ID</span>
+                  </label>
+                  <button type="button" id="scan-qr-btn" class="inline-flex items-center gap-1 text-[11px] text-secondary hover:text-emerald-700 py-0.5 px-2 rounded-md bg-secondary-container/30 font-semibold transition-colors">
+                    <span class="material-symbols-outlined text-[13px]">qr_code_scanner</span>
+                    <span data-i18n="scan_qr">Scan QR</span>
+                  </button>
+                </div>
+                <div class="relative flex items-center">
+                  <input class="w-full bg-surface-container-low text-on-surface text-sm rounded-xl px-3.5 py-2.5 pl-9 border border-transparent focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all font-medium" id="input-node-id" type="text" value="NODE-PUNJAB-04-A" required />
+                  <span class="material-symbols-outlined absolute left-2.5 text-on-surface-variant text-[18px]">cell_tower</span>
+                </div>
+                <div class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-surface-container-low text-[11px] text-on-secondary-container">
+                  <span class="material-symbols-outlined text-secondary text-[15px]">wifi_tethering</span>
+                  <span class="truncate" data-i18n="auto_detected">Auto-Detected on Local Mesh: <strong class="font-semibold text-on-surface">Sector 4 (Wheat & Mustard)</strong></span>
+                </div>
+              </div>
+
+              <!-- Security PIN -->
+              <div class="flex flex-col gap-1">
+                <div class="flex items-center justify-between">
+                  <label class="text-xs font-semibold text-on-surface flex items-center gap-1.5" for="input-password">
+                    <span class="material-symbols-outlined text-[16px] text-secondary">key</span>
+                    <span data-i18n="password_label">Security Password / Farm PIN</span>
+                  </label>
+                  <a href="#forgot" class="text-[11px] text-on-surface-variant hover:text-primary transition-colors" data-i18n="forgot_pin">Forgot PIN?</a>
+                </div>
+                <div class="relative flex items-center">
+                  <input class="w-full bg-surface-container-low text-on-surface text-sm rounded-xl px-3.5 py-2.5 pl-9 pr-9 border border-transparent focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all" id="input-password" type="password" value="882144" required />
+                  <span class="material-symbols-outlined absolute left-2.5 text-on-surface-variant text-[18px]">lock</span>
+                  <button type="button" id="toggle-pwd-btn" class="absolute right-2.5 text-on-surface-variant hover:text-on-surface p-1">
+                    <span class="material-symbols-outlined text-[18px]" id="eye-icon">visibility</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Offline Badge -->
+              <div class="flex items-center gap-2 py-1 px-3 rounded-lg bg-surface-container text-on-surface-variant text-[11px]">
+                <span class="material-symbols-outlined text-tertiary-container text-[16px]">cloud_off</span>
+                <span data-i18n="offline_auth">Local Edge Authentication (Zero Internet Required)</span>
+              </div>
+
+              <!-- Submit Buttons -->
+              <div class="mt-1 flex flex-col gap-2">
+                <button type="submit" id="login-submit-btn" class="w-full h-11 bg-primary text-on-primary rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-md hover:opacity-95 active:scale-[0.99] transition-all">
+                  <span data-i18n="btn_login">Secure Login to Farm Terminal</span>
+                  <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+                </button>
+                <button type="button" id="biometric-login-btn" class="w-full h-10 bg-surface-container-high text-on-surface rounded-xl font-semibold text-xs flex items-center justify-center gap-2 hover:bg-surface-dim transition-all">
+                  <span class="material-symbols-outlined text-secondary text-[20px]">fingerprint</span>
+                  <span data-i18n="btn_biometric">Quick Biometric Access (Face / Fingerprint)</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Diagnostics Preview -->
+          <div class="mt-3.5 w-full bg-surface-container-low rounded-xl p-3.5 flex flex-col gap-2.5 border border-outline-variant/30">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-bold text-on-surface-variant flex items-center gap-1 uppercase tracking-wide text-[10px]" data-i18n="telemetry_handshake">
+                <span class="material-symbols-outlined text-[14px] text-secondary">satellite_alt</span>
+                Field Node Telemetry Handshake
+              </span>
+              <span class="text-secondary font-bold text-[11px]" data-i18n="mesh_health">100% Mesh Health</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2 text-center">
+              <div class="bg-surface-container-lowest rounded-lg p-2 flex flex-col items-center">
+                <span class="text-[10px] text-on-surface-variant font-medium" data-i18n="mesh_latency">Mesh Latency</span>
+                <span class="font-extrabold text-sm text-on-surface mt-0.5">14<span class="text-[10px] font-normal">ms</span></span>
+                <span class="text-[9px] text-secondary font-mono">LoRa P2P</span>
+              </div>
+              <div class="bg-surface-container-lowest rounded-lg p-2 flex flex-col items-center">
+                <span class="text-[10px] text-on-surface-variant font-medium" data-i18n="battery_node">Battery Node</span>
+                <span class="font-extrabold text-sm text-secondary mt-0.5">94<span class="text-[10px] font-normal">%</span></span>
+                <span class="text-[9px] text-on-surface-variant">Solar Active</span>
+              </div>
+              <div class="bg-surface-container-lowest rounded-lg p-2 flex flex-col items-center">
+                <span class="text-[10px] text-on-surface-variant font-medium" data-i18n="sensors_online">Sensors Online</span>
+                <span class="font-extrabold text-sm text-on-surface mt-0.5">18<span class="text-[10px] font-normal">/18</span></span>
+                <span class="text-[9px] text-secondary">Soil + NDVI</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Helpline & Trust badges -->
+          <div class="mt-3 flex flex-col items-center gap-2">
+            <div class="flex flex-wrap items-center justify-center gap-2.5 text-[10px] text-on-surface-variant">
+              <span class="inline-flex items-center gap-1 font-semibold"><span class="material-symbols-outlined text-[13px] text-primary">verified_user</span> AES-256</span>
+              <span>•</span>
+              <span class="inline-flex items-center gap-1 font-semibold"><span class="material-symbols-outlined text-[13px] text-primary">agriculture</span> KVK Certified</span>
+              <span>•</span>
+              <span class="inline-flex items-center gap-1 font-semibold"><span class="material-symbols-outlined text-[13px] text-primary">security</span> ICAR Protocol V3</span>
+            </div>
+            
+            <div class="w-full bg-surface-container rounded-xl p-2.5 flex items-center justify-between text-left">
+              <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded-full bg-primary-container text-on-primary flex items-center justify-center shrink-0">
+                  <span class="material-symbols-outlined text-[15px]">support_agent</span>
+                </div>
+                <div class="flex flex-col min-w-0">
+                  <span class="text-[11px] font-bold text-on-surface truncate" data-i18n="support_title">Hardware Activation Assistance</span>
+                  <span class="text-[10px] text-on-surface-variant truncate" data-i18n="support_subtitle">Kisan Call Centre 24/7 (Toll-Free)</span>
+                </div>
+              </div>
+              <a href="tel:18001801551" class="px-2.5 py-1 rounded-lg bg-surface-container-lowest text-[11px] text-primary font-bold shadow-xs hover:bg-emerald-50">
+                1800-180-1551
+              </a>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- SCREEN 2: FARM COMMAND DASHBOARD SCREEN   -->
+        <!-- ========================================== -->
+        <section id="screen-dashboard" class="hidden flex-col w-full p-3.5 gap-3.5">
+          
+          <!-- Welcome & Season Banner -->
+          <div class="bg-surface-container-lowest p-3.5 rounded-2xl shadow-sm border border-outline-variant/30 flex flex-col gap-2 relative overflow-hidden">
+            <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-secondary-container/20 rounded-full blur-xl pointer-events-none"></div>
+            
+            <div class="flex items-start justify-between">
+              <div class="flex flex-col min-w-0">
+                <div class="flex items-center gap-1.5 text-on-surface-variant text-[11px]">
+                  <span class="material-symbols-outlined text-[14px] text-amber-500">wb_sunny</span>
+                  <span data-i18n="rabi_cycle">Season: Rabi Cycle • 08:42 AM IST</span>
+                </div>
+                <h1 class="font-extrabold text-lg text-primary tracking-tight mt-0.5" data-i18n="good_morning">
+                  Good morning, Ramesh Patel 👋
+                </h1>
+                <p class="text-xs text-on-surface-variant mt-0.5" data-i18n="dash_desc">
+                  Farm health summary across Zones A–D. Local edge neural engine operational.
+                </p>
+              </div>
+              <span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container text-[10px] font-bold flex items-center gap-1 shrink-0">
+                <span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
+                18ms Local
+              </span>
+            </div>
+
+            <!-- Quick Filter Chips -->
+            <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1" id="dash-filter-chips">
+              <button class="filter-chip active px-3 py-1 rounded-full text-xs font-bold bg-primary text-on-primary shadow-xs whitespace-nowrap transition-all" data-category="all" data-i18n="all_telemetry">All Telemetry</button>
+              <button class="filter-chip px-3 py-1 rounded-full text-xs font-semibold bg-surface-container text-on-surface-variant hover:text-on-surface whitespace-nowrap transition-all" data-category="zones" data-i18n="zones_tab">🌾 Zones (4)</button>
+              <button class="filter-chip px-3 py-1 rounded-full text-xs font-semibold bg-surface-container text-on-surface-variant hover:text-on-surface whitespace-nowrap transition-all" data-category="diagnosis" data-i18n="ai_diag_tab">🔍 AI Diagnosis</button>
+              <button class="filter-chip px-3 py-1 rounded-full text-xs font-semibold bg-surface-container text-on-surface-variant hover:text-on-surface whitespace-nowrap transition-all" data-category="pumps" data-i18n="smart_pumps_tab">💧 Smart Pumps</button>
+              <button class="filter-chip px-3 py-1 rounded-full text-xs font-semibold bg-surface-container text-on-surface-variant hover:text-on-surface whitespace-nowrap transition-all flex items-center gap-1" data-category="alerts">
+                <span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+                <span data-i18n="alerts_tab">Alerts (3)</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Vitality Metrics Horizontal Rail -->
+          <div class="flex flex-col gap-1.5">
+            <div class="flex items-center justify-between px-1">
+              <span class="text-xs font-bold text-on-surface uppercase tracking-wider">Field Vitality Metrics</span>
+              <span class="text-[10px] text-on-surface-variant font-mono">Sync: 12s ago</span>
+            </div>
+            
+            <div class="flex gap-2.5 overflow-x-auto no-scrollbar py-0.5">
+              <!-- Health Score Gauge -->
+              <div class="min-w-[155px] max-w-[155px] bg-surface-container-lowest p-3 rounded-2xl shadow-sm border border-outline-variant/30 flex flex-col justify-between shrink-0">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-on-surface-variant" data-i18n="health_score">Health Score</span>
+                  <span class="material-symbols-outlined text-[16px] text-secondary">verified</span>
+                </div>
+                <div class="flex items-center gap-2 my-1.5">
+                  <div class="relative w-11 h-11 shrink-0">
+                    <svg class="w-11 h-11 transform -rotate-90" viewBox="0 0 36 36">
+                      <path class="text-surface-container" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3.5"></path>
+                      <path class="text-secondary" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="88, 100" stroke-linecap="round" stroke-width="3.5"></path>
+                    </svg>
+                    <div class="absolute inset-0 flex items-center justify-center font-extrabold text-sm text-primary">88</div>
+                  </div>
+                  <div class="flex flex-col leading-tight">
+                    <span class="text-xs font-bold text-secondary" data-i18n="optimal">Good</span>
+                    <span class="text-[10px] text-on-surface-variant">+3 pts/wk</span>
+                  </div>
+                </div>
+                <span class="text-[10px] text-on-surface-variant">Target: 95/100</span>
+              </div>
+
+              <!-- Soil Moisture Avg -->
+              <div class="min-w-[140px] max-w-[140px] bg-surface-container-lowest p-3 rounded-2xl shadow-sm border border-outline-variant/30 flex flex-col justify-between shrink-0">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-on-surface-variant" data-i18n="soil_moisture">Soil Moisture</span>
+                  <span class="material-symbols-outlined text-[16px] text-sky-600">water_drop</span>
+                </div>
+                <div class="my-1">
+                  <div class="text-lg font-extrabold text-on-surface">41<span class="text-xs font-medium text-on-surface-variant">%</span></div>
+                  <div class="w-full bg-surface-container rounded-full h-1.5 mt-1 overflow-hidden">
+                    <div class="bg-sky-600 h-1.5 rounded-full" style="width: 68%;"></div>
+                  </div>
+                </div>
+                <span class="text-[10px] text-secondary font-medium">Optimal: 38–45%</span>
+              </div>
+
+              <!-- Water Reservoir -->
+              <div class="min-w-[140px] max-w-[140px] bg-surface-container-lowest p-3 rounded-2xl shadow-sm border border-outline-variant/30 flex flex-col justify-between shrink-0">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-on-surface-variant" data-i18n="reservoir">Reservoir</span>
+                  <span class="material-symbols-outlined text-[16px] text-sky-800">storage</span>
+                </div>
+                <div class="my-1">
+                  <div class="text-lg font-extrabold text-on-surface">76<span class="text-xs font-medium text-on-surface-variant">%</span></div>
+                  <span class="text-[10px] text-on-surface-variant">32,400 Litres</span>
+                </div>
+                <span class="text-[10px] text-secondary font-medium">Safe for 4.5 days</span>
+              </div>
+
+              <!-- Pest Risk -->
+              <div class="min-w-[145px] max-w-[145px] bg-surface-container-lowest p-3 rounded-2xl shadow-sm border border-outline-variant/30 flex flex-col justify-between shrink-0">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-on-surface-variant" data-i18n="pest_risk">Pest Risk</span>
+                  <span class="material-symbols-outlined text-[16px] text-error">pest_control</span>
+                </div>
+                <div class="my-1">
+                  <div class="flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-error"></span>
+                    <span class="text-sm font-bold text-error" data-i18n="moderate">Moderate</span>
+                  </div>
+                  <span class="text-[10px] text-on-surface-variant truncate">Zone C Whitefly</span>
+                </div>
+                <span class="text-[10px] text-error font-semibold" data-i18n="action_needed">Action Needed</span>
+              </div>
+
+              <!-- Heat Stress Index -->
+              <div class="min-w-[135px] max-w-[135px] bg-surface-container-lowest p-3 rounded-2xl shadow-sm border border-outline-variant/30 flex flex-col justify-between shrink-0">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-on-surface-variant" data-i18n="heat_index">Heat Index</span>
+                  <span class="material-symbols-outlined text-[16px] text-amber-600">device_thermostat</span>
+                </div>
+                <div class="my-1">
+                  <div class="text-lg font-extrabold text-on-surface">37°<span class="text-xs font-medium text-on-surface-variant">C</span></div>
+                  <span class="text-[10px] text-on-surface-variant">Peak: 1:30 PM</span>
+                </div>
+                <span class="text-[10px] text-amber-700 dark:text-amber-400 font-medium">Canopy shade ok</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Interactive 4-Zone Matrix -->
+          <div class="bg-surface-container-lowest p-3.5 rounded-2xl shadow-sm border border-outline-variant/30 flex flex-col gap-2.5">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[18px] text-primary">grid_view</span>
+                <h2 class="font-bold text-sm text-primary" data-i18n="zone_matrix_title">Farm Zone Matrix</h2>
+              </div>
+              <span class="px-2 py-0.5 rounded-full bg-surface-container text-[11px] font-semibold text-on-surface" data-i18n="active_zones">
+                4 Active Zones
+              </span>
+            </div>
+
+            <!-- 2x2 Zone Grid -->
+            <div class="grid grid-cols-2 gap-2">
+              <!-- Zone A -->
+              <div class="zone-grid-item cursor-pointer bg-surface-container-low hover:bg-surface-container p-2.5 rounded-xl transition-all border border-transparent hover:border-secondary flex flex-col justify-between gap-1" onclick="selectDashboardZone('zone-a')">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                    <span class="font-bold text-xs text-primary">Zone A</span>
+                  </div>
+                  <span class="text-[9px] bg-surface-container px-1.5 py-0.5 rounded text-on-surface font-semibold">North</span>
+                </div>
+                <div class="my-0.5">
+                  <p class="text-[10px] text-on-surface-variant truncate">Wheat & Tomato (4.2 Ha)</p>
+                  <div class="flex items-baseline justify-between mt-0.5 text-xs">
+                    <span class="text-on-surface-variant text-[11px]">Soil: <strong class="text-on-surface font-bold">44%</strong></span>
+                    <span class="text-secondary font-bold text-[11px]">89% HP</span>
+                  </div>
+                </div>
+                <div class="flex items-center gap-1 text-[10px] bg-surface-container-highest/60 px-1.5 py-0.5 rounded text-on-surface font-medium">
+                  <span class="material-symbols-outlined text-[13px] text-primary">biotech</span>
+                  <span class="truncate">Inspect Leaf Spots</span>
+                </div>
+              </div>
+
+              <!-- Zone B (CRITICAL) -->
+              <div class="zone-grid-item cursor-pointer bg-error-container/20 hover:bg-error-container/30 p-2.5 rounded-xl transition-all border border-error/30 flex flex-col justify-between gap-1" onclick="selectDashboardZone('zone-b')">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-error animate-ping"></span>
+                    <span class="font-bold text-xs text-error">Zone B</span>
+                  </div>
+                  <span class="text-[9px] bg-error-container px-1.5 py-0.5 rounded text-on-error-container font-bold uppercase">Urgent</span>
+                </div>
+                <div class="my-0.5">
+                  <p class="text-[10px] text-on-surface-variant truncate">Cotton Bt (3.8 Ha)</p>
+                  <div class="flex items-baseline justify-between mt-0.5 text-xs">
+                    <span class="text-error font-bold text-[11px]">Soil: 29% (Low)</span>
+                    <span class="text-on-surface-variant text-[11px]">74% HP</span>
+                  </div>
+                </div>
+                <div class="flex items-center gap-1 text-[10px] bg-error-container text-on-error-container px-1.5 py-0.5 rounded font-bold">
+                  <span class="material-symbols-outlined text-[13px]">water_drop</span>
+                  <span class="truncate">IRRIGATE NOW</span>
+                </div>
+              </div>
+
+              <!-- Zone C -->
+              <div class="zone-grid-item cursor-pointer bg-surface-container-low hover:bg-surface-container p-2.5 rounded-xl transition-all border border-transparent hover:border-secondary flex flex-col justify-between gap-1" onclick="selectDashboardZone('zone-c')">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-secondary"></span>
+                    <span class="font-bold text-xs text-primary">Zone C</span>
+                  </div>
+                  <span class="text-[9px] bg-surface-container px-1.5 py-0.5 rounded text-on-surface font-semibold">South</span>
+                </div>
+                <div class="my-0.5">
+                  <p class="text-[10px] text-on-surface-variant truncate">Chilli & Mustard (2.5 Ha)</p>
+                  <div class="flex items-baseline justify-between mt-0.5 text-xs">
+                    <span class="text-on-surface-variant text-[11px]">Soil: <strong class="text-on-surface font-bold">42%</strong></span>
+                    <span class="text-secondary font-bold text-[11px]">81% HP</span>
+                  </div>
+                </div>
+                <div class="flex items-center gap-1 text-[10px] bg-surface-container-highest/60 px-1.5 py-0.5 rounded text-on-surface font-medium">
+                  <span class="material-symbols-outlined text-[13px] text-error">pest_control</span>
+                  <span class="truncate">Whitefly Count +14</span>
+                </div>
+              </div>
+
+              <!-- Zone D -->
+              <div class="zone-grid-item cursor-pointer bg-surface-container-low hover:bg-surface-container p-2.5 rounded-xl transition-all border border-transparent hover:border-secondary flex flex-col justify-between gap-1" onclick="selectDashboardZone('zone-d')">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-secondary"></span>
+                    <span class="font-bold text-xs text-secondary">Zone D</span>
+                  </div>
+                  <span class="text-[9px] bg-secondary-container px-1.5 py-0.5 rounded text-on-secondary-container font-semibold">West</span>
+                </div>
+                <div class="my-0.5">
+                  <p class="text-[10px] text-on-surface-variant truncate">Sugarcane (6.0 Ha)</p>
+                  <div class="flex items-baseline justify-between mt-0.5 text-xs">
+                    <span class="text-on-surface-variant text-[11px]">Soil: <strong class="text-on-surface font-bold">48%</strong></span>
+                    <span class="text-secondary font-bold text-[11px]">96% HP</span>
+                  </div>
+                </div>
+                <div class="flex items-center gap-1 text-[10px] bg-secondary-container text-on-secondary-container px-1.5 py-0.5 rounded font-semibold">
+                  <span class="material-symbols-outlined text-[13px]">check_circle</span>
+                  <span class="truncate">Optimal Status</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Active Zone Inspector Drawer -->
+            <div id="dash-zone-inspector" class="bg-surface-container p-2.5 rounded-xl flex items-center justify-between gap-2 mt-1">
+              <div class="flex items-center gap-2 min-w-0">
+                <div class="w-7 h-7 rounded-full bg-error-container text-on-error-container flex items-center justify-center shrink-0">
+                  <span class="material-symbols-outlined text-[16px]">warning</span>
+                </div>
+                <div class="flex flex-col min-w-0">
+                  <span class="text-xs font-bold text-on-surface truncate" id="dash-drawer-title">Zone B Selected (East Plot)</span>
+                  <span class="text-[11px] text-error font-medium truncate" id="dash-drawer-desc">Moisture critical at 29% • Heat forecast 38°C</span>
+                </div>
+              </div>
+              <button class="px-3 py-1 rounded-full bg-primary text-on-primary text-xs font-bold shrink-0 shadow-xs flex items-center gap-1 hover:bg-emerald-900" onclick="navigateTo('irrigation-telemetry')">
+                <span>Solve</span>
+                <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Live Edge Camera AI Preview -->
+          <div class="bg-surface-container-lowest p-3.5 rounded-2xl shadow-sm border border-outline-variant/30 flex flex-col gap-2">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[18px] text-primary">videocam</span>
+                <h2 class="font-bold text-sm text-primary" data-i18n="live_edge_cam">Live Edge Camera Preview</h2>
+              </div>
+              <span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container text-[10px] font-bold flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
+                <span>Cam #02 • Zone A</span>
+              </span>
+            </div>
+
+            <!-- Camera Viewport with Real AI Overlay Boxes & Laser Scanning HUD -->
+            <div class="relative w-full h-52 rounded-2xl overflow-hidden bg-slate-950 shadow-inner group border border-slate-800">
+              <!-- Live Leaf Sample Photo -->
+              <img id="dashboard-cam-feed" src="/leaf_sample.jpg" alt="Tomato Leaf Scan" class="w-full h-full object-cover opacity-95 transition-transform duration-700 group-hover:scale-105" />
+              
+              <!-- Ambient Scrim Gradient -->
+              <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-transparent to-slate-950/50 pointer-events-none"></div>
+              
+              <!-- Animated Laser Scanner Line -->
+              <div class="laser-scanner-line" id="camera-laser-scanner"></div>
+
+              <!-- AI Bounding Box 1: Early Blight Concentric Rings -->
+              <div class="absolute top-8 left-4 w-32 h-22 border-2 border-dashed border-red-500 rounded-lg flex flex-col justify-between p-1 bg-red-500/20 backdrop-blur-xs cursor-pointer transition-transform hover:scale-105" onclick="navigateTo('crop-ai-scanner')">
+                <span class="bg-red-600 text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded-sm self-start flex items-center gap-1 shadow-sm">
+                  <span class="material-symbols-outlined text-[11px]">bug_report</span>
+                  Early Blight 91%
+                </span>
+                <div class="self-end bg-black/80 backdrop-blur-sm text-red-300 text-[8px] px-1.5 py-0.5 rounded font-mono font-bold flex items-center gap-0.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping"></span>
+                  <span>Cu-Oxy Spray</span>
+                </div>
+              </div>
+
+              <!-- AI Bounding Box 2: Healthy Apex -->
+              <div class="absolute bottom-12 right-4 w-22 h-18 border-2 border-emerald-500 rounded-lg flex flex-col justify-between p-1 bg-emerald-500/15 backdrop-blur-xs pointer-events-none">
+                <span class="bg-emerald-600 text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded-sm self-start flex items-center gap-1 shadow-sm">
+                  <span class="material-symbols-outlined text-[11px]">eco</span>
+                  Apex 98%
+                </span>
+                <span class="text-[8px] bg-black/60 text-emerald-300 px-1 rounded self-end font-mono">Normal</span>
+              </div>
+
+              <!-- Dynamic Spectral Telemetry HUD Overlay (Center) -->
+              <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full border border-emerald-500/40 text-[9px] text-emerald-300 font-mono flex items-center gap-1.5 pointer-events-none">
+                <span class="material-symbols-outlined text-[12px] text-emerald-400 animate-spin">rotate_right</span>
+                <span>NDVI: 0.81 • Leaf Temp: 28.4°C</span>
+              </div>
+
+              <!-- Camera Header info -->
+              <div class="absolute top-2 left-2 right-2 flex items-center justify-between text-white text-[10px] z-10">
+                <div class="flex items-center gap-1.5 bg-black/70 backdrop-blur-md px-2 py-0.5 rounded-full border border-white/10">
+                  <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+                  <span class="font-bold font-mono" data-i18n="rec_badge">REC • 1080p 24fps</span>
+                </div>
+                <div class="bg-black/70 backdrop-blur-md px-2.5 py-0.5 rounded-full font-mono text-emerald-400 flex items-center gap-1 border border-emerald-500/30">
+                  <span class="material-symbols-outlined text-[13px]">memory</span>
+                  <span class="font-bold" data-i18n="npu_badge">NPU: 18ms • Offline</span>
+                </div>
+              </div>
+
+              <!-- Camera Bottom Actions & HUD Switcher -->
+              <div class="absolute bottom-2 left-2 right-2 flex items-center justify-between z-10">
+                <div class="flex items-center gap-1.5">
+                  <button title="Take Snapshot" class="w-8 h-8 rounded-full bg-white/95 text-slate-900 flex items-center justify-center hover:bg-white active:scale-90 transition-transform shadow-md" onclick="triggerSnapshot()">
+                    <span class="material-symbols-outlined text-[16px]">photo_camera</span>
+                  </button>
+                  <button title="Switch Camera Lens" class="w-8 h-8 rounded-full bg-white/95 text-slate-900 flex items-center justify-center hover:bg-white active:scale-90 transition-transform shadow-md" onclick="switchCameraFeed()">
+                    <span class="material-symbols-outlined text-[16px]">switch_camera</span>
+                  </button>
+                  <button title="NIR Thermal Mode" id="toggle-nir-btn" class="w-8 h-8 rounded-full bg-emerald-900/90 border border-emerald-400 text-emerald-300 flex items-center justify-center hover:bg-emerald-800 active:scale-90 transition-transform shadow-md" onclick="toggleThermalNIR()">
+                    <span class="material-symbols-outlined text-[16px]">thermostat</span>
+                  </button>
+                </div>
+                
+                <button class="bg-primary text-on-primary px-3 py-1.5 rounded-full text-xs font-bold shadow-md hover:bg-emerald-900 active:scale-95 transition-all flex items-center gap-1" onclick="navigateTo('crop-ai-scanner')">
+                  <span class="material-symbols-outlined text-[14px]">psychology</span>
+                  <span data-i18n="deep_scan">Deep Scan (4 Leaves)</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Priority Actions -->
+          <div class="bg-surface-container-lowest p-3.5 rounded-2xl shadow-sm border border-outline-variant/30 flex flex-col gap-2.5">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[18px] text-error">crisis_alert</span>
+                <h2 class="font-bold text-sm text-primary" data-i18n="priority_interventions">Priority Interventions</h2>
+              </div>
+              <span class="px-2 py-0.5 rounded-full bg-error-container text-on-error-container text-[10px] font-bold">
+                3 Pending
+              </span>
+            </div>
+
+            <!-- Action 1: High Urgency -->
+            <div class="bg-surface-container-low p-3 rounded-xl flex flex-col gap-1.5 border-l-4 border-error">
+              <div class="flex items-start justify-between gap-1">
+                <div class="flex items-center gap-2">
+                  <span class="w-5 h-5 rounded-full bg-error text-white flex items-center justify-center text-[11px] font-bold shrink-0">!</span>
+                  <div>
+                    <span class="font-bold text-xs text-on-surface block leading-tight">Irrigate Zone B Immediately</span>
+                    <span class="text-[10px] text-on-surface-variant">East Cotton Plot • Soil 29% • Temp 38°C</span>
+                  </div>
+                </div>
+                <span class="px-1.5 py-0.5 rounded bg-error-container text-on-error-container text-[9px] font-bold">HIGH</span>
+              </div>
+              <p class="text-[11px] text-on-surface-variant">
+                Thermal sensor predicts root wilt within 3 hours. Automated valve #4 is primed.
+              </p>
+              <div class="flex items-center justify-end gap-2 pt-0.5">
+                <button class="px-2.5 py-1 rounded-lg text-on-surface-variant text-[11px] hover:bg-surface-container" onclick="dismissActionCard(this)">Snooze 1h</button>
+                <button class="px-3 py-1 rounded-lg bg-secondary text-white text-[11px] font-bold flex items-center gap-1 shadow-xs active:scale-95" onclick="quickStartPump('Zone B Drip (30m)')">
+                  <span class="material-symbols-outlined text-[14px]">water_drop</span>
+                  <span>Start Smart Drip (30m)</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Action 2: Medium Urgency -->
+            <div class="bg-surface-container-low p-3 rounded-xl flex flex-col gap-1.5 border-l-4 border-amber-500">
+              <div class="flex items-start justify-between gap-1">
+                <div class="flex items-center gap-2">
+                  <span class="w-5 h-5 rounded-full bg-surface-container-highest text-on-surface flex items-center justify-center text-[11px] font-bold shrink-0">2</span>
+                  <div>
+                    <span class="font-bold text-xs text-on-surface block leading-tight">Inspect Zone A for Early Blight</span>
+                    <span class="text-[10px] text-on-surface-variant">North Tomato Sector 2 • 4 Leaves Flagged</span>
+                  </div>
+                </div>
+                <span class="px-1.5 py-0.5 rounded bg-surface-container text-on-surface-variant text-[9px] font-bold">MED</span>
+              </div>
+              <div class="flex items-center justify-end gap-2 pt-0.5">
+                <button class="px-3 py-1 rounded-lg bg-primary text-on-primary text-[11px] font-bold flex items-center gap-1 shadow-xs active:scale-95" onclick="navigateTo('crop-ai-scanner')">
+                  <span class="material-symbols-outlined text-[14px]">document_scanner</span>
+                  <span>Open Crop Scanner</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Direct Motor Controls & Emergency Safety Cutoff -->
+          <div class="bg-surface-container-lowest p-3.5 rounded-2xl shadow-sm border border-outline-variant/30 flex flex-col gap-2.5">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[18px] text-primary">bolt</span>
+                <h2 class="font-bold text-sm text-primary" data-i18n="direct_motor_controls">Direct Motor Controls</h2>
+              </div>
+              <span class="text-[10px] font-bold text-on-secondary-container bg-secondary-container px-2 py-0.5 rounded">Mesh Armed</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+              <button class="motor-card p-3 rounded-xl bg-surface-container-low hover:bg-surface-container flex flex-col items-start justify-between min-h-[76px] text-left transition-colors border border-transparent hover:border-secondary" onclick="toggleMotorState('pump1')">
+                <div class="flex items-center justify-between w-full">
+                  <span class="text-[11px] font-bold text-on-surface-variant">Pump #1 (Canal)</span>
+                  <span class="w-2.5 h-2.5 rounded-full bg-outline-variant motor-dot-pump1"></span>
+                </div>
+                <div class="w-full flex items-center justify-between mt-1">
+                  <span class="text-xs font-extrabold text-on-surface motor-status-pump1">OFF</span>
+                  <span class="text-[10px] text-primary font-bold">Tap to Run</span>
+                </div>
+              </button>
+
+              <button class="motor-card p-3 rounded-xl bg-surface-container-low hover:bg-surface-container flex flex-col items-start justify-between min-h-[76px] text-left transition-colors border border-transparent hover:border-secondary" onclick="toggleMotorState('borewell2')">
+                <div class="flex items-center justify-between w-full">
+                  <span class="text-[11px] font-bold text-on-surface-variant">Borewell #2 (Zone B)</span>
+                  <span class="w-2.5 h-2.5 rounded-full bg-secondary animate-pulse motor-dot-borewell2"></span>
+                </div>
+                <div class="w-full flex items-center justify-between mt-1">
+                  <span class="text-xs font-extrabold text-secondary motor-status-borewell2">SCHEDULED</span>
+                  <span class="text-[10px] text-on-surface-variant">09:00 AM</span>
+                </div>
+              </button>
+            </div>
+
+            <!-- Emergency Field Cutoff Button -->
+            <button class="w-full mt-1 bg-surface-container hover:bg-error-container/40 p-2.5 rounded-xl flex items-center justify-between text-left transition-colors group" onclick="showEmergencyModal()">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-error text-[18px]">power_settings_new</span>
+                <span class="text-xs text-error font-bold uppercase tracking-wider" data-i18n="emergency_cutoff">Emergency Field Cutoff</span>
+              </div>
+              <span class="text-[11px] text-on-surface-variant group-hover:text-error font-medium">Safe Stop All</span>
+            </button>
+          </div>
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- SCREEN 3: SMART IRRIGATION CONTROL SCREEN  -->
+        <!-- ========================================== -->
+        <section id="screen-irrigation" class="hidden flex-col w-full p-3.5 gap-3.5">
+          
+          <!-- Hydraulic Mesh Online Bar -->
+          <div class="flex items-center justify-between bg-surface-container px-3 py-2 rounded-xl border border-outline-variant/30">
+            <div class="flex items-center gap-2">
+              <span class="flex h-2.5 w-2.5 relative">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-secondary"></span>
+              </span>
+              <span class="text-xs text-primary font-bold uppercase tracking-wider" data-i18n="hydraulic_mesh">Hydraulic Mesh Online</span>
+            </div>
+            <div class="flex items-center gap-1 text-on-surface-variant text-[11px]">
+              <span class="material-symbols-outlined text-[15px] text-sky-700">sensors</span>
+              <span>4 Valves Syncing · 2.4 bar</span>
+            </div>
+          </div>
+
+          <!-- Priority Recommendation Hero Card -->
+          <div class="relative overflow-hidden rounded-2xl bg-surface-container-lowest p-4 shadow-sm border border-outline-variant/30 flex flex-col gap-3">
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-sky-100 dark:bg-sky-950/40 rounded-full blur-xl pointer-events-none"></div>
+            
+            <div class="flex items-start gap-3">
+              <div class="w-11 h-11 rounded-xl bg-tertiary-container text-white flex items-center justify-center shrink-0 shadow-sm">
+                <span class="material-symbols-outlined text-[24px]">water_drop</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2">
+                  <span class="bg-error-container text-on-error-container text-[10px] px-2 py-0.5 rounded-full font-bold uppercase" data-i18n="urgent">Action Advised</span>
+                  <span class="text-on-surface-variant text-[10px]">ET0 5.8 mm/d</span>
+                </div>
+                <h2 class="font-extrabold text-sm text-on-surface mt-1 leading-snug" data-i18n="irrigation_hero_title">
+                  Irrigation Recommended for Zone B
+                </h2>
+                <p class="text-xs text-on-surface-variant mt-0.5">
+                  Low moisture (<span class="font-bold text-error">29%</span>) combined with high ambient heat (<span class="font-bold text-on-surface">36.4°C</span>) and <span class="font-bold text-on-surface">0% rain</span> projected for 48h.
+                </p>
+              </div>
+            </div>
+
+            <!-- Moisture Deficit Meter -->
+            <div class="bg-surface-container-low rounded-xl p-3">
+              <div class="flex justify-between items-center mb-1">
+                <span class="text-xs font-semibold text-on-surface-variant">Zone B Moisture Deficit</span>
+                <span class="text-xs font-bold text-error">29% <span class="text-on-surface-variant font-normal">/ 45% optimal</span></span>
+              </div>
+              <div class="w-full bg-surface-variant rounded-full h-2.5 relative overflow-hidden">
+                <div class="bg-error h-full rounded-full transition-all duration-700" style="width: 29%"></div>
+              </div>
+              <div class="flex justify-between text-[9px] text-outline font-medium mt-1">
+                <span>Wilting (15%)</span>
+                <span class="text-secondary font-bold">Target Zone (38–48%)</span>
+                <span>Field Capacity (60%)</span>
+              </div>
+            </div>
+
+            <!-- Trigger Button -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <button id="irrigate-now-trigger" class="sm:col-span-2 w-full h-11 bg-primary text-on-primary font-bold text-xs rounded-xl flex items-center justify-center gap-2 active:scale-[0.98] transition shadow-md hover:bg-emerald-900">
+                <span class="material-symbols-outlined text-[18px]">play_circle</span>
+                <span data-i18n="irrigate_zone_b_btn">Irrigate Zone B Now (35 mins)</span>
+              </button>
+              <div class="grid grid-cols-2 gap-1.5 sm:col-span-1">
+                <button class="h-11 bg-surface-container-high text-on-surface font-semibold text-xs rounded-xl flex items-center justify-center gap-1 hover:bg-surface-dim" onclick="showToast('Snoozed irrigation recommendation by 2 hours')">
+                  <span class="material-symbols-outlined text-[16px]">snooze</span>
+                  <span>+2 Hrs</span>
+                </button>
+                <button class="h-11 bg-surface-container-high text-on-surface font-semibold text-xs rounded-xl flex items-center justify-center gap-1 hover:bg-surface-dim" onclick="showToast('Adjusted target moisture threshold to 48%')">
+                  <span class="material-symbols-outlined text-[16px]">tune</span>
+                  <span>Tune</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pipeline & Valve Layout Schematic -->
+          <div class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm border border-outline-variant/30 flex flex-col gap-2.5">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-secondary text-[20px]">hub</span>
+                <h3 class="font-bold text-sm text-on-surface" data-i18n="pipeline_schematic">Pipeline & Zone Layout</h3>
+              </div>
+              <span class="bg-secondary-container text-on-secondary-container text-[10px] font-bold px-2 py-0.5 rounded-full">
+                Line: 2.4 Bar Nom
+              </span>
+            </div>
+
+            <!-- Visual Graphic Pipeline Box -->
+            <div class="relative w-full bg-surface-container-low rounded-xl p-3 overflow-hidden border border-outline-variant/20">
+              <div class="w-full flex items-center justify-between relative z-10">
+                <div class="flex items-center gap-1.5 bg-primary text-on-primary px-2.5 py-1 rounded-lg text-xs font-bold shadow-xs">
+                  <span class="material-symbols-outlined text-[15px]">solar_power</span>
+                  <span>Pump #1 (415V)</span>
+                </div>
+                <div class="bg-surface-container-lowest px-2 py-0.5 rounded-full text-[10px] font-bold text-on-surface shadow-xs">
+                  2.4 Bar Nom
+                </div>
+                <div class="bg-tertiary-container text-white px-2 py-0.5 rounded-lg text-[10px] font-bold shadow-xs">
+                  Bore -42m
+                </div>
+              </div>
+
+              <!-- Trunk Pipe Flow Graphic -->
+              <div class="my-3 h-2 bg-sky-200 dark:bg-sky-950 rounded-full pipe-water-flow"></div>
+
+              <!-- 4 Zone Valve Status Tiles -->
+              <div class="grid grid-cols-4 gap-1.5 z-10 relative">
+                <!-- Zone A Valve -->
+                <div class="bg-surface-container-lowest p-2 rounded-xl flex flex-col justify-between min-h-[82px] border border-outline-variant/20 text-center">
+                  <span class="font-bold text-[11px] text-on-surface">Zone A</span>
+                  <div class="my-0.5">
+                    <span class="font-bold text-secondary text-xs">46%</span>
+                    <span class="text-[8px] text-on-surface-variant block">Wheat Drip</span>
+                  </div>
+                  <span class="text-[8px] font-bold text-slate-400 uppercase">Shut</span>
+                </div>
+
+                <!-- Zone B Valve (Urgent) -->
+                <div class="bg-red-50 dark:bg-red-950/40 p-2 rounded-xl flex flex-col justify-between min-h-[82px] border border-red-300 dark:border-red-800 text-center">
+                  <div class="flex items-center justify-center gap-1">
+                    <span class="font-bold text-[11px] text-error">Zone B</span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-error animate-ping"></span>
+                  </div>
+                  <div class="my-0.5">
+                    <span class="font-bold text-error text-xs">29%</span>
+                    <span class="text-[8px] text-on-surface-variant block">Mustard Micro</span>
+                  </div>
+                  <span class="text-[8px] font-bold text-error uppercase">Queue</span>
+                </div>
+
+                <!-- Zone C Valve -->
+                <div class="bg-surface-container-lowest p-2 rounded-xl flex flex-col justify-between min-h-[82px] border border-outline-variant/20 text-center">
+                  <span class="font-bold text-[11px] text-on-surface">Zone C</span>
+                  <div class="my-0.5">
+                    <span class="font-bold text-on-surface text-xs">42%</span>
+                    <span class="text-[8px] text-on-surface-variant block">Barley Sprink</span>
+                  </div>
+                  <span class="text-[8px] font-bold text-slate-400 uppercase">Shut</span>
+                </div>
+
+                <!-- Zone D Valve -->
+                <div class="bg-surface-container-lowest p-2 rounded-xl flex flex-col justify-between min-h-[82px] border border-outline-variant/20 text-center">
+                  <span class="font-bold text-[11px] text-on-surface">Zone D</span>
+                  <div class="my-0.5">
+                    <span class="font-bold text-secondary text-xs">51%</span>
+                    <span class="text-[8px] text-on-surface-variant block">Fodder Furrow</span>
+                  </div>
+                  <span class="text-[8px] font-bold text-slate-400 uppercase">Shut</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Solar Pump #1 Telemetry Card -->
+          <div class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm border border-outline-variant/30 flex flex-col gap-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-surface-container text-primary flex items-center justify-center">
+                  <span class="material-symbols-outlined text-[20px]">power</span>
+                </div>
+                <div>
+                  <h3 class="font-bold text-sm text-on-surface" data-i18n="solar_pump_title">Solar Pump #1</h3>
+                  <span class="text-[10px] text-on-surface-variant">Bore #4 · Submersible 7.5 HP</span>
+                </div>
+              </div>
+              <div class="flex flex-col items-end">
+                <span class="bg-surface-container px-2 py-0.5 rounded-full text-[10px] font-bold text-on-surface-variant">
+                  IDLE / STANDBY
+                </span>
+                <span class="text-[10px] text-secondary font-semibold mt-0.5">Health: 98%</span>
+              </div>
+            </div>
+
+            <!-- Voltage & Flow Grid -->
+            <div class="grid grid-cols-3 gap-2 bg-surface-container-low p-2.5 rounded-xl text-center">
+              <div>
+                <span class="text-[10px] text-on-surface-variant">Grid / Voltage</span>
+                <span class="font-extrabold text-sm text-on-surface block mt-0.5">415 V</span>
+                <span class="text-[9px] text-secondary font-semibold">3-Phase Bal</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-on-surface-variant">Draw Current</span>
+                <span class="font-extrabold text-sm text-on-surface block mt-0.5">12.4 A</span>
+                <span class="text-[9px] text-secondary font-semibold">Thermal OK</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-on-surface-variant">Max Capacity</span>
+                <span class="font-extrabold text-sm text-sky-700 dark:text-sky-400 block mt-0.5">180 L/m</span>
+                <span class="text-[9px] text-on-surface-variant">Flow Meter</span>
+              </div>
+            </div>
+
+            <!-- Interactive Slide-to-Confirm Emergency Override -->
+            <div class="bg-error-container/30 p-3 rounded-xl flex flex-col gap-1.5 border border-error/30">
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-bold text-error flex items-center gap-1 uppercase tracking-wide text-[10px]" data-i18n="manual_override">
+                  <span class="material-symbols-outlined text-[15px]">warning</span>
+                  Emergency Manual Override
+                </span>
+                <span class="text-[10px] text-error font-semibold">Auto-cutoff: 45m</span>
+              </div>
+
+              <!-- Draggable Slider -->
+              <div class="relative w-full h-11 bg-surface-container-lowest rounded-full overflow-hidden flex items-center px-1 shadow-inner select-none cursor-pointer" id="pump-slider-track">
+                <div class="absolute left-0 top-0 bottom-0 bg-red-500/20 w-10 transition-all" id="pump-slider-fill"></div>
+                <div class="relative z-10 w-9 h-9 rounded-full bg-error text-white flex items-center justify-center shadow-md transition-transform" id="pump-slider-knob">
+                  <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+                </div>
+                <span class="absolute inset-0 flex items-center justify-center text-xs text-on-surface-variant font-semibold pointer-events-none" id="pump-slider-label" data-i18n="slide_to_confirm">
+                  Slide to force activate pump
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Root Zone Dual Depth Bento -->
+          <div class="grid grid-cols-2 gap-2">
+            <div class="bg-surface-container-lowest p-3 rounded-2xl shadow-sm border border-outline-variant/30 flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-on-surface-variant" data-i18n="root_zone_probe">Root Zone Probe</span>
+                <span class="material-symbols-outlined text-[16px] text-secondary">psychology_alt</span>
+              </div>
+              <div class="flex flex-col gap-1.5 my-2">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-[11px] text-on-surface">15 cm Topsoil</span>
+                  <span class="font-bold text-error text-[11px]">24% DRY</span>
+                </div>
+                <div class="w-full bg-surface-container-high rounded-full h-1.5 overflow-hidden">
+                  <div class="bg-error h-full rounded-full" style="width: 24%"></div>
+                </div>
+                <div class="flex items-center justify-between text-xs pt-1">
+                  <span class="text-[11px] text-on-surface">30 cm Sub-Root</span>
+                  <span class="font-bold text-secondary text-[11px]">34% MOIST</span>
+                </div>
+                <div class="w-full bg-surface-container-high rounded-full h-1.5 overflow-hidden">
+                  <div class="bg-secondary h-full rounded-full" style="width: 34%"></div>
+                </div>
+              </div>
+              <span class="text-[9px] text-on-surface-variant font-mono">Zone B Probes #8841</span>
+            </div>
+
+            <!-- Atmosphere Demand -->
+            <div class="bg-surface-container-lowest p-3 rounded-2xl shadow-sm border border-outline-variant/30 flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-on-surface-variant">Atmosphere</span>
+                <span class="material-symbols-outlined text-[16px] text-amber-500">sunny</span>
+              </div>
+              <div class="flex flex-col gap-1 my-1">
+                <div class="flex items-baseline gap-1">
+                  <span class="text-base font-extrabold text-on-surface">28.5°C</span>
+                  <span class="text-[10px] text-on-surface-variant">Soil Temp</span>
+                </div>
+                <div class="flex items-center justify-between text-[10px] text-on-surface-variant">
+                  <span>Rain 48h:</span>
+                  <span class="font-bold text-on-surface">0.0 mm</span>
+                </div>
+                <div class="flex items-center justify-between text-[10px] text-on-surface-variant">
+                  <span>ET0 Loss:</span>
+                  <span class="font-bold text-error">5.8 mm/d</span>
+                </div>
+              </div>
+              <span class="text-[9px] text-secondary font-semibold">High evaporation</span>
+            </div>
+          </div>
+
+          <!-- 7-Day Water Consumption Telemetry -->
+          <div class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm border border-outline-variant/30 flex flex-col gap-2.5">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-sky-700 text-[18px]">bar_chart</span>
+                <h3 class="font-bold text-sm text-on-surface" data-i18n="water_consumption">Water Consumption Telemetry</h3>
+              </div>
+              <span class="text-[10px] font-bold text-on-secondary-container bg-secondary-container px-2 py-0.5 rounded-full">
+                +32% Saved
+              </span>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 text-center bg-surface-container-low p-2.5 rounded-xl">
+              <div>
+                <span class="text-[10px] text-on-surface-variant">Today</span>
+                <span class="font-extrabold text-xs text-primary block mt-0.5">4,200 L</span>
+                <span class="text-[8px] text-secondary font-bold">38% under budget</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-on-surface-variant">This Week</span>
+                <span class="font-extrabold text-xs text-on-surface block mt-0.5">28.4 kL</span>
+                <span class="text-[8px] text-on-surface-variant">4 cycles run</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-on-surface-variant">This Month</span>
+                <span class="font-extrabold text-xs text-on-surface block mt-0.5">112 kL</span>
+                <span class="text-[8px] text-secondary font-bold">Benchmark</span>
+              </div>
+            </div>
+
+            <!-- SVG Line Chart -->
+            <div class="bg-surface-container-low/50 p-2 rounded-xl">
+              <div class="flex justify-between items-center mb-1 text-[10px] text-on-surface-variant">
+                <span>7-Day Drip vs Flood Baseline</span>
+                <span class="text-secondary font-bold">Micro Drip Active</span>
+              </div>
+              <svg class="w-full h-14" preserveAspectRatio="none" viewBox="0 0 320 60">
+                <path d="M 10,12 L 55,10 L 105,14 L 155,11 L 205,13 L 255,10 L 305,12" fill="none" stroke="#d5e3fc" stroke-dasharray="4,4" stroke-width="2"></path>
+                <path d="M 10,48 L 55,38 L 105,42 L 155,32 L 205,40 L 255,36 L 305,44" fill="none" stroke="#006d30" stroke-linecap="round" stroke-width="2.5"></path>
+                <circle cx="10" cy="48" fill="#003b1b" r="3"></circle>
+                <circle cx="55" cy="38" fill="#003b1b" r="3"></circle>
+                <circle cx="105" cy="42" fill="#003b1b" r="3"></circle>
+                <circle cx="155" cy="32" fill="#003b1b" r="3"></circle>
+                <circle cx="205" cy="40" fill="#003b1b" r="3"></circle>
+                <circle cx="255" cy="36" fill="#003b1b" r="3"></circle>
+                <circle cx="305" cy="44" fill="#006d30" r="3"></circle>
+              </svg>
+              <div class="flex justify-between text-[8px] text-on-surface-variant font-mono px-1">
+                <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span class="font-bold text-primary">Sun</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- SCREEN 4: FIELD ZONES & CLIMATE RISK       -->
+        <!-- ========================================== -->
+        <section id="screen-zones" class="hidden flex-col w-full p-3.5 gap-3.5">
+          
+          <!-- Top Header -->
+          <div class="bg-surface-container-lowest rounded-2xl p-3.5 shadow-sm border border-outline-variant/30 flex flex-col gap-2.5">
+            <div class="flex items-start justify-between">
+              <div>
+                <div class="flex items-center gap-1">
+                  <span class="w-2 h-2 rounded-full bg-secondary"></span>
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-secondary">Telemetry Sync Live</span>
+                </div>
+                <h2 class="font-bold text-base text-primary">Field Zones & Climate Risk</h2>
+                <p class="text-xs text-on-surface-variant">Real-time LoRa sensor telemetry and 7-day environmental stress forecasting</p>
+              </div>
+              <div class="text-right">
+                <span class="text-lg font-extrabold text-primary">36.8°C</span>
+                <span class="text-[10px] text-on-surface-variant flex items-center justify-end gap-0.5">
+                  <span class="material-symbols-outlined text-[13px] text-sky-700">water_drop</span> 38% RH
+                </span>
+              </div>
+            </div>
+
+            <!-- Zone Filter Buttons -->
+            <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5" id="zone-filter-pills">
+              <button class="zone-filter-pill active px-3 py-1 rounded-full text-xs font-bold bg-primary text-on-primary transition-all shrink-0" data-filter="all">All Zones (4)</button>
+              <button class="zone-filter-pill px-3 py-1 rounded-full text-xs font-semibold bg-surface-container text-on-surface-variant hover:text-on-surface transition-all shrink-0 flex items-center gap-1" data-filter="zone-a">
+                <span>Zone A</span><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+              </button>
+              <button class="zone-filter-pill px-3 py-1 rounded-full text-xs font-semibold bg-surface-container text-on-surface-variant hover:text-on-surface transition-all shrink-0 flex items-center gap-1" data-filter="zone-b">
+                <span>Zone B</span><span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+              </button>
+              <button class="zone-filter-pill px-3 py-1 rounded-full text-xs font-semibold bg-surface-container text-on-surface-variant hover:text-on-surface transition-all shrink-0 flex items-center gap-1" data-filter="zone-c">
+                <span>Zone C</span><span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+              </button>
+              <button class="zone-filter-pill px-3 py-1 rounded-full text-xs font-semibold bg-surface-container text-on-surface-variant hover:text-on-surface transition-all shrink-0 flex items-center gap-1" data-filter="zone-d">
+                <span>Zone D</span><span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Micro-Plot GIS Thermal Map -->
+          <div class="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/30 overflow-hidden flex flex-col">
+            <div class="p-3 pb-1 flex items-center justify-between">
+              <div class="flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-secondary text-[18px]">layers</span>
+                <span class="text-xs font-bold text-primary">Micro-Plot Thermal Map</span>
+              </div>
+              <div class="flex items-center gap-1.5 text-[10px] text-on-surface-variant">
+                <span>Mesh Latency: 142ms</span>
+                <span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-bold font-mono">LoRaWAN</span>
+              </div>
+            </div>
+
+            <!-- SVG Polygon Field Map -->
+            <div class="relative w-full h-48 bg-slate-900 overflow-hidden">
+              <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&auto=format&fit=crop&q=80" alt="Farmland Sat View" class="w-full h-full object-cover opacity-60" />
+              
+              <svg class="absolute inset-0 w-full h-full" preserveAspectRatio="none" viewBox="0 0 360 220">
+                <!-- Zone A Polygon -->
+                <polygon points="12,12 170,14 165,105 15,98" class="fill-emerald-500/25 stroke-emerald-400 stroke-2 cursor-pointer hover:fill-emerald-500/40 transition-all" onclick="openZoneDetailsModal('zone-a')"></polygon>
+                <!-- Zone B Polygon (Critical) -->
+                <polygon points="185,15 348,12 345,110 180,105" class="fill-red-500/30 stroke-red-500 stroke-2 cursor-pointer hover:fill-red-500/45 animate-pulse transition-all" onclick="openZoneDetailsModal('zone-b')"></polygon>
+                <!-- Zone C Polygon -->
+                <polygon points="15,115 165,118 160,205 10,200" class="fill-amber-500/25 stroke-amber-500 stroke-2 cursor-pointer hover:fill-amber-500/40 transition-all" onclick="openZoneDetailsModal('zone-c')"></polygon>
+                <!-- Zone D Polygon -->
+                <polygon points="180,120 345,122 342,205 175,202" class="fill-sky-500/25 stroke-sky-400 stroke-2 cursor-pointer hover:fill-sky-500/40 transition-all" onclick="openZoneDetailsModal('zone-d')"></polygon>
+
+                <!-- Sensor Nodes -->
+                <circle cx="85" cy="55" r="4" class="fill-white stroke-primary stroke-2"></circle>
+                <circle cx="265" cy="60" r="5" class="fill-white stroke-red-500 stroke-2 animate-ping"></circle>
+                <circle cx="85" cy="160" r="4" class="fill-white stroke-amber-500 stroke-2"></circle>
+                <circle cx="260" cy="160" r="4" class="fill-white stroke-emerald-500 stroke-2"></circle>
+              </svg>
+
+              <!-- Map Overlay Pins -->
+              <button class="absolute top-2 left-2 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm px-2 py-0.5 rounded shadow text-[10px] font-bold text-primary" onclick="openZoneDetailsModal('zone-a')">
+                Zone A: 89% HP
+              </button>
+              <button class="absolute top-2 right-2 bg-red-600 text-white px-2 py-0.5 rounded shadow text-[10px] font-bold flex items-center gap-1" onclick="openZoneDetailsModal('zone-b')">
+                <span class="material-symbols-outlined text-[12px]">warning</span>
+                <span>Zone B: 29% Low</span>
+              </button>
+              <button class="absolute bottom-2 left-2 bg-amber-600 text-white px-2 py-0.5 rounded shadow text-[10px] font-bold flex items-center gap-1" onclick="openZoneDetailsModal('zone-c')">
+                <span class="material-symbols-outlined text-[12px]">pest_control</span>
+                <span>Zone C: Pests</span>
+              </button>
+              <button class="absolute bottom-2 right-2 bg-emerald-600 text-white px-2 py-0.5 rounded shadow text-[10px] font-bold" onclick="openZoneDetailsModal('zone-d')">
+                Zone D: 96% Opt
+              </button>
+            </div>
+          </div>
+
+          <!-- Zone Cards List -->
+          <div class="flex flex-col gap-2.5" id="zone-cards-container">
+            <!-- Rendered dynamically from data.js -->
+          </div>
+
+          <!-- Climate-Stress Risk Radar -->
+          <div class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm border border-outline-variant/30 flex flex-col gap-2.5">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-red-600 text-[18px]">radar</span>
+                <h3 class="font-bold text-sm text-primary">Climate-Stress Risk Radar</h3>
+              </div>
+              <span class="px-2 py-0.5 rounded-full bg-error-container text-on-error-container text-[10px] font-bold uppercase">
+                2 Alerts Active
+              </span>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <div class="bg-surface-container-low p-2.5 rounded-xl border-l-4 border-error flex flex-col gap-1">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="font-bold text-on-surface">1. Heat Stress Risk</span>
+                  <span class="text-[9px] font-bold bg-error text-white px-1.5 py-0.5 rounded">HIGH 🔴</span>
+                </div>
+                <p class="text-[11px] text-on-surface">
+                  <span class="font-semibold text-primary">Root Cause:</span> Daytime temp exceeding 37.5°C with low relative humidity.
+                </p>
+                <span class="text-[10px] text-secondary font-medium">Action: Canopy misting & soil cover retention</span>
+              </div>
+
+              <div class="bg-surface-container-low p-2.5 rounded-xl border-l-4 border-amber-500 flex flex-col gap-1">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="font-bold text-on-surface">2. Drought / Water Stress</span>
+                  <span class="text-[9px] font-bold bg-amber-500 text-white px-1.5 py-0.5 rounded">MODERATE 🟡</span>
+                </div>
+                <p class="text-[11px] text-on-surface">
+                  <span class="font-semibold text-primary">Affected:</span> Zone B Cotton Seedlings.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- 7-Day Risk & Thermal Trend Bar Chart -->
+          <div class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm border border-outline-variant/30 flex flex-col gap-2.5">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="font-bold text-sm text-primary">7-Day Risk & Thermal Trend</h3>
+                <p class="text-[10px] text-on-surface-variant">Tap any day bar to view micro-climate advice</p>
+              </div>
+              <div class="flex items-center gap-1.5 text-[9px] text-on-surface-variant font-medium">
+                <span class="flex items-center gap-0.5"><span class="w-2 h-2 rounded bg-error"></span> High</span>
+                <span class="flex items-center gap-0.5"><span class="w-2 h-2 rounded bg-amber-500"></span> Mod</span>
+                <span class="flex items-center gap-0.5"><span class="w-2 h-2 rounded bg-secondary"></span> Low</span>
+              </div>
+            </div>
+
+            <!-- 7 Bars Grid -->
+            <div class="grid grid-cols-7 gap-1.5 items-end h-32 pt-2 pb-1 border-b border-outline-variant/20">
+              <div class="flex flex-col items-center gap-1 h-full justify-end cursor-pointer group" onclick="showChartDayInsight('Mon', '34°C', 'Moderate Risk', 'Mild soil moisture drop')">
+                <span class="text-[9px] font-mono text-on-surface-variant">34°</span>
+                <div class="w-full rounded-t-md bg-amber-500/80 group-hover:opacity-100 transition-all" style="height: 55%"></div>
+                <span class="text-[9px] font-bold text-on-surface">Mon</span>
+              </div>
+              <div class="flex flex-col items-center gap-1 h-full justify-end cursor-pointer group" onclick="showChartDayInsight('Tue', '36°C', 'Moderate Risk', 'Afternoon canopy heat peak')">
+                <span class="text-[9px] font-mono text-on-surface-variant">36°</span>
+                <div class="w-full rounded-t-md bg-amber-500/80 group-hover:opacity-100 transition-all" style="height: 68%"></div>
+                <span class="text-[9px] font-bold text-on-surface">Tue</span>
+              </div>
+              <div class="flex flex-col items-center gap-1 h-full justify-end cursor-pointer group" onclick="showChartDayInsight('Wed', '38°C', 'High Risk', 'Heatwave warning - Max transpiration')">
+                <span class="text-[9px] font-mono text-error font-bold">38°</span>
+                <div class="w-full rounded-t-md bg-error group-hover:opacity-100 transition-all" style="height: 85%"></div>
+                <span class="text-[9px] font-bold text-error">Wed</span>
+              </div>
+              <div class="flex flex-col items-center gap-1 h-full justify-end cursor-pointer group" onclick="showChartDayInsight('Thu', '37°C', 'High Risk', 'Persistent thermal strain on cotton')">
+                <span class="text-[9px] font-mono text-error font-bold">37°</span>
+                <div class="w-full rounded-t-md bg-error group-hover:opacity-100 transition-all" style="height: 78%"></div>
+                <span class="text-[9px] font-bold text-error">Thu</span>
+              </div>
+              <div class="flex flex-col items-center gap-1 h-full justify-end cursor-pointer group" onclick="showChartDayInsight('Fri', '35°C', 'Moderate Risk', 'Slight overcast evening relief')">
+                <span class="text-[9px] font-mono text-on-surface-variant">35°</span>
+                <div class="w-full rounded-t-md bg-amber-500/80 group-hover:opacity-100 transition-all" style="height: 62%"></div>
+                <span class="text-[9px] font-bold text-on-surface">Fri</span>
+              </div>
+              <div class="flex flex-col items-center gap-1 h-full justify-end cursor-pointer group" onclick="showChartDayInsight('Sat', '33°C', 'Low Risk', 'Cooler winds and standard moisture balance')">
+                <span class="text-[9px] font-mono text-secondary">33°</span>
+                <div class="w-full rounded-t-md bg-secondary group-hover:opacity-100 transition-all" style="height: 48%"></div>
+                <span class="text-[9px] font-bold text-secondary">Sat</span>
+              </div>
+              <div class="flex flex-col items-center gap-1 h-full justify-end cursor-pointer group" onclick="showChartDayInsight('Sun', '32°C', 'Low Risk', 'Optimal crop photosynthesis window')">
+                <span class="text-[9px] font-mono text-secondary">32°</span>
+                <div class="w-full rounded-t-md bg-secondary group-hover:opacity-100 transition-all" style="height: 42%"></div>
+                <span class="text-[9px] font-bold text-secondary">Sun</span>
+              </div>
+            </div>
+
+            <!-- Dynamic Bar Insight -->
+            <div id="chart-insight-bar" class="bg-surface-container-low p-2 rounded-lg flex items-center justify-between text-xs">
+              <span class="text-[11px] text-on-surface truncate" id="chart-insight-msg">Wed Peak: 38°C • Heatwave Warning</span>
+              <span class="text-[10px] font-bold text-primary shrink-0">AI Forecast</span>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- SCREEN 5: CROP HEALTH AI SCANNER           -->
+        <!-- ========================================== -->
+        <section id="screen-crop-ai" class="hidden flex-col w-full p-3.5 gap-3.5">
+          
+          <!-- Top Title -->
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+              <div class="w-7 h-7 rounded-lg bg-primary-container text-on-primary flex items-center justify-center shadow-xs">
+                <span class="material-symbols-outlined text-[16px]">psychology</span>
+              </div>
+              <h2 class="font-bold text-base text-primary" data-i18n="crop_ai_title">Crop Health AI Diagnosis</h2>
+            </div>
+            <span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container text-[10px] font-bold flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
+              v4.2 Vision Model
+            </span>
+          </div>
+
+          <!-- Feed Switcher -->
+          <div class="p-1 rounded-xl bg-surface-container flex items-center gap-1 text-xs">
+            <button id="feed-btn-leaf" class="flex-1 py-1.5 px-2 rounded-lg bg-surface-container-lowest text-primary font-bold shadow-xs transition-all flex items-center justify-center gap-1" onclick="switchCropFeed('leaf')">
+              <span class="material-symbols-outlined text-[15px] text-secondary">center_focus_strong</span>
+              <span class="truncate">Leaf Cam #2 (Zone A)</span>
+            </button>
+            <button id="feed-btn-drone" class="flex-1 py-1.5 px-2 rounded-lg text-on-surface-variant font-medium hover:text-on-surface transition-all flex items-center justify-center gap-1" onclick="switchCropFeed('drone')">
+              <span class="material-symbols-outlined text-[15px]">flight</span>
+              <span class="truncate">Drone Sweep #4</span>
+            </button>
+          </div>
+
+          <!-- Quick Action Buttons -->
+          <div class="grid grid-cols-2 gap-2">
+            <button id="btn-capture-leaf" class="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-primary text-on-primary font-bold text-xs shadow-md active:scale-[0.98] transition-transform" onclick="triggerCameraCapture()">
+              <span class="material-symbols-outlined text-[18px]">photo_camera</span>
+              <span data-i18n="capture_leaf">Capture Leaf</span>
+            </button>
+            <label class="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-surface-container-high text-on-surface font-bold text-xs shadow-xs active:scale-[0.98] transition-transform cursor-pointer hover:bg-surface-dim">
+              <span class="material-symbols-outlined text-[18px] text-primary">upload_file</span>
+              <span data-i18n="upload_sample">Upload Sample</span>
+              <input type="file" accept="image/*" class="hidden" onchange="handleSampleUpload(event)" />
+            </label>
+          </div>
+
+          <!-- Scanner Viewport with AI Detection Boxes & Laser Scan -->
+          <div class="rounded-2xl bg-surface-container-lowest p-3.5 shadow-sm border border-outline-variant/30 flex flex-col gap-3">
+            <div class="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-slate-950 shadow-inner border border-slate-800">
+              <img id="scanner-image" alt="Tomato leaf sample" class="w-full h-full object-cover" src="/leaf_sample.jpg" />
+              <div class="absolute inset-0 bg-gradient-to-t from-primary/70 via-transparent to-black/20 pointer-events-none"></div>
+              
+              <!-- Animated Laser Scanner Line -->
+              <div class="laser-scanner-line"></div>
+              
+              <!-- Tag Detected Badge -->
+              <div class="absolute top-2 left-2 flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/90 backdrop-blur-md text-primary text-[10px] font-bold shadow-xs">
+                <span class="w-1.5 h-1.5 rounded-full bg-error animate-ping"></span>
+                <span>Target Detected (x11 foci)</span>
+              </div>
+              <div class="absolute top-2 right-2 flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/80 backdrop-blur-md text-white text-[10px] font-mono shadow-xs">
+                <span class="material-symbols-outlined text-[12px]">tune</span>
+                <span>Mesh Node 04A</span>
+              </div>
+
+              <!-- Focus A: Early Blight Concentric Rings -->
+              <div class="absolute top-[28%] left-[34%] w-[28%] h-[26%] rounded border-2 border-dashed border-error bg-error/15 cursor-pointer group flex flex-col justify-between p-1 transition-transform hover:scale-105" onclick="showToast('Focus A: Alternaria Solani Bullseye Lesion (91% Match)')">
+                <span class="self-start px-1 py-0.2 rounded bg-error text-white text-[8px] uppercase tracking-wider font-bold">Spot A</span>
+                <div class="self-end flex items-center gap-0.5 bg-black/70 backdrop-blur-sm px-1 rounded text-white text-[8px] font-mono">
+                  <span>91% conf</span>
+                </div>
+              </div>
+
+              <!-- Apex Healthy Box -->
+              <div class="absolute top-[54%] left-[26%] w-[22%] h-[20%] rounded border border-secondary-fixed bg-secondary/15 cursor-pointer p-0.5" onclick="showToast('Focus B: Marginal Vein Normal Tissue (94%)')">
+                <span class="px-1 py-0.2 rounded bg-primary text-white text-[8px]">94% leaf</span>
+              </div>
+
+              <!-- Bottom Leaf Info -->
+              <div class="absolute bottom-2 left-2 right-2 flex items-center justify-between text-white text-[10px]">
+                <span class="flex items-center gap-1 font-semibold"><span class="material-symbols-outlined text-[13px]">macro_auto</span> Solanum lycopersicum (Tomato)</span>
+                <span class="bg-black/50 px-1.5 py-0.5 rounded font-mono">RGB+NIR</span>
+              </div>
+            </div>
+
+            <!-- AI Pathology Breakdown -->
+            <div class="flex flex-col gap-1">
+              <div class="flex items-center justify-between flex-wrap gap-1">
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-error-container text-on-error-container text-[10px] font-bold">
+                  <span class="material-symbols-outlined text-[13px]">coronavirus</span>
+                  Fungal Pathology
+                </span>
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant text-[10px] font-semibold">
+                  <span class="material-symbols-outlined text-[13px] text-secondary">verified</span>
+                  Environment-Aware
+                </span>
+              </div>
+              <h3 class="font-extrabold text-base text-primary pt-0.5" data-i18n="possible_early_blight">Possible Early Blight</h3>
+              <p class="text-[11px] text-on-surface-variant italic">Alternaria solani f. sp. lycopersici</p>
+            </div>
+
+            <!-- 4-Stat Grid -->
+            <div class="grid grid-cols-2 gap-2">
+              <div class="p-2.5 rounded-xl bg-surface-container-low flex flex-col justify-between">
+                <span class="text-[10px] text-on-surface-variant" data-i18n="diagnosis_confidence">Diagnosis Confidence</span>
+                <div class="pt-1">
+                  <div class="flex items-baseline justify-between mb-0.5">
+                    <span class="text-base font-extrabold text-primary">91%</span>
+                    <span class="text-[10px] text-secondary font-bold">High Match</span>
+                  </div>
+                  <div class="w-full bg-surface-container-highest h-1.5 rounded-full overflow-hidden">
+                    <div class="bg-secondary h-full rounded-full" style="width: 91%"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="p-2.5 rounded-xl bg-surface-container-low flex flex-col justify-between">
+                <span class="text-[10px] text-on-surface-variant" data-i18n="infection_severity">Infection Severity</span>
+                <div class="pt-1">
+                  <span class="text-sm font-extrabold text-error block">Stage II</span>
+                  <span class="text-[10px] text-on-surface-variant">Moderate Early Stage</span>
+                </div>
+              </div>
+
+              <div class="p-2.5 rounded-xl bg-surface-container-low flex flex-col justify-between">
+                <span class="text-[10px] text-on-surface-variant">Affected Area</span>
+                <div class="pt-1">
+                  <span class="text-sm font-extrabold text-primary block">~14%</span>
+                  <span class="text-[10px] text-on-surface-variant">Leaf Surface Impact</span>
+                </div>
+              </div>
+
+              <div class="p-2.5 rounded-xl bg-surface-container-low flex flex-col justify-between">
+                <span class="text-[10px] text-on-surface-variant">Soil Moisture</span>
+                <div class="pt-1">
+                  <span class="text-sm font-extrabold text-primary block">42%</span>
+                  <span class="text-[10px] text-secondary font-medium">Optimal Band</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Environmental Vector Correlation -->
+            <div class="p-2.5 rounded-xl bg-surface-container flex items-start gap-2 text-xs">
+              <span class="material-symbols-outlined text-[16px] text-amber-600 shrink-0 mt-0.5">thermostat</span>
+              <div class="flex flex-col">
+                <span class="font-bold text-on-surface">Environmental Vector Trigger (Correlated)</span>
+                <p class="text-[11px] text-on-surface-variant mt-0.5">
+                  High relative ambient humidity (68%) + canopy heat (32.4°C) created sporulation window over past 36 hrs.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Agronomic Action Protocol Card -->
+          <div class="rounded-2xl bg-surface-container-lowest p-3.5 shadow-sm border border-outline-variant/30 flex flex-col gap-2.5">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-primary"></span>
+                <h3 class="font-bold text-sm text-primary" data-i18n="agronomic_protocol">Agronomic Action Protocol</h3>
+              </div>
+              <span class="text-[10px] text-on-surface-variant bg-surface-container px-2 py-0.5 rounded-full font-semibold">3 Steps</span>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <div class="p-2.5 rounded-xl bg-surface-container flex items-start gap-2 text-xs">
+                <div class="w-5 h-5 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center shrink-0">1</div>
+                <div>
+                  <span class="font-bold text-primary block">Cultural Control (Manual Pruning)</span>
+                  <p class="text-[11px] text-on-surface-variant">Prune lower infected leaves with yellow halos. Bag and dispose off-field.</p>
+                </div>
+              </div>
+
+              <div class="p-2.5 rounded-xl bg-surface-container flex items-start gap-2 text-xs">
+                <div class="w-5 h-5 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center shrink-0">2</div>
+                <div>
+                  <span class="font-bold text-primary block">Irrigation Mode Adjustment</span>
+                  <p class="text-[11px] text-on-surface-variant">Switch Zone A from overhead sprinklers to root-zone drip line before 3:00 PM.</p>
+                </div>
+              </div>
+
+              <div class="p-2.5 rounded-xl bg-surface-container flex items-start gap-2 text-xs">
+                <div class="w-5 h-5 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center shrink-0">3</div>
+                <div>
+                  <span class="font-bold text-primary block">Bio-Fungicide Application</span>
+                  <p class="text-[11px] text-on-surface-variant">Apply <em>Trichoderma viride</em> (5g/L) or Copper Oxychloride 50 WP (2.5g/L) in early morning.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="grid grid-cols-2 gap-2 pt-1">
+              <button class="py-2 px-3 rounded-xl bg-primary text-on-primary text-xs font-bold flex items-center justify-center gap-1 shadow-sm active:scale-95" onclick="logScanResult(this)">
+                <span class="material-symbols-outlined text-[16px]">fact_check</span>
+                <span data-i18n="mark_and_log">Mark & Log Scan</span>
+              </button>
+              <button class="py-2 px-3 rounded-xl bg-surface-container-high text-on-surface text-xs font-bold flex items-center justify-center gap-1 shadow-xs active:scale-95" onclick="queueSchedule(this)">
+                <span class="material-symbols-outlined text-[16px] text-primary">add_task</span>
+                <span data-i18n="add_to_schedule">Add to Schedule</span>
+              </button>
+            </div>
+            
+            <button class="w-full py-2 px-3 rounded-xl bg-secondary-container text-on-secondary-container text-xs font-bold flex items-center justify-center gap-1.5 shadow-xs active:scale-95" onclick="consultKvk()">
+              <span class="material-symbols-outlined text-[16px]">support_agent</span>
+              <span data-i18n="consult_kvk">Consult KVK Agronomist</span>
+            </button>
+          </div>
+
+          <!-- Diagnostic History -->
+          <div class="rounded-2xl bg-surface-container-lowest p-3.5 shadow-sm border border-outline-variant/30 flex flex-col gap-2">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-secondary text-[18px]">history</span>
+                <h3 class="font-bold text-sm text-primary" data-i18n="recent_diagnostics">Recent Field Diagnostics</h3>
+              </div>
+              <span class="text-[10px] text-secondary font-bold">Archive (24)</span>
+            </div>
+
+            <div class="flex flex-col gap-2" id="diagnostics-history-list">
+              <!-- Rendered from data.js -->
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- SCREEN 6: SETTINGS & FARM CONFIG ("MORE")  -->
+        <!-- ========================================== -->
+        <section id="screen-more" class="hidden flex-col w-full p-3.5 gap-3.5">
+          <div class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm border border-outline-variant/30 flex items-center gap-3">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=160&auto=format&fit=crop&q=80" alt="Farmer" class="w-14 h-14 rounded-full object-cover ring-2 ring-emerald-500" />
+            <div class="flex flex-col min-w-0">
+              <h2 class="font-extrabold text-base text-primary">Ramesh Patel</h2>
+              <span class="text-xs text-on-surface-variant font-mono">Farmer ID: RP-7492-PB</span>
+              <span class="text-[10px] text-secondary font-semibold mt-0.5">Green Acres Farm #4 (Punjab) • 16.5 Hectares</span>
+            </div>
+          </div>
+
+          <!-- Settings Items -->
+          <div class="bg-surface-container-lowest rounded-2xl p-3.5 shadow-sm border border-outline-variant/30 flex flex-col gap-2">
+            <span class="text-xs font-bold text-primary uppercase tracking-wider">Gateway & Radio Hardware</span>
+            
+            <div class="flex items-center justify-between p-2 rounded-xl bg-surface-container-low text-xs">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px] text-primary">cell_tower</span>
+                <div>
+                  <span class="font-semibold block text-on-surface">LoRa Frequency Band</span>
+                  <span class="text-[10px] text-on-surface-variant">IN865-867 MHz (India Compliant)</span>
+                </div>
+              </div>
+              <span class="px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-mono font-bold text-[10px]">Active</span>
+            </div>
+
+            <div class="flex items-center justify-between p-2 rounded-xl bg-surface-container-low text-xs">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px] text-primary">sd_storage</span>
+                <div>
+                  <span class="font-semibold block text-on-surface">Edge Offline Cache</span>
+                  <span class="text-[10px] text-on-surface-variant">100% Neural models cached offline</span>
+                </div>
+              </div>
+              <span class="text-secondary font-bold text-[11px]">Synchronized</span>
+            </div>
+
+            <div class="flex items-center justify-between p-2 rounded-xl bg-surface-container-low text-xs">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px] text-primary">volume_up</span>
+                <div>
+                  <span class="font-semibold block text-on-surface">Sound & Audio Haptics</span>
+                  <span class="text-[10px] text-on-surface-variant">Tactile feedback on triggers</span>
+                </div>
+              </div>
+              <input type="checkbox" checked class="w-4 h-4 text-emerald-600 rounded" onchange="toggleSoundSetting(this)" />
+            </div>
+          </div>
+
+          <!-- Language Settings -->
+          <div class="bg-surface-container-lowest rounded-2xl p-3.5 shadow-sm border border-outline-variant/30 flex flex-col gap-2">
+            <span class="text-xs font-bold text-primary uppercase tracking-wider">Language / भाषा / భాష</span>
+            <div class="grid grid-cols-3 gap-2">
+              <button class="lang-switch-btn p-2 rounded-xl border border-primary bg-primary text-white text-xs font-bold text-center" data-lang="en">
+                English
+              </button>
+              <button class="lang-switch-btn p-2 rounded-xl border border-outline-variant bg-surface-container-low text-on-surface text-xs font-bold text-center hover:bg-surface-container" data-lang="hi">
+                हिंदी
+              </button>
+              <button class="lang-switch-btn p-2 rounded-xl border border-outline-variant bg-surface-container-low text-on-surface text-xs font-bold text-center hover:bg-surface-container" data-lang="te">
+                తెలుగు
+              </button>
+            </div>
+          </div>
+
+          <!-- Report Export & Logout -->
+          <div class="flex flex-col gap-2">
+            <button class="w-full h-11 bg-primary-container text-on-primary rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-xs hover:opacity-95" onclick="exportFarmReport()">
+              <span class="material-symbols-outlined text-[18px]">download</span>
+              <span>Export Farm Telemetry Report (PDF / CSV)</span>
+            </button>
+            <button class="w-full h-10 bg-error-container text-on-error-container rounded-xl font-bold text-xs flex items-center justify-center gap-2 hover:opacity-95" onclick="logoutFarmer()">
+              <span class="material-symbols-outlined text-[18px]">logout</span>
+              <span>Disconnect Gateway Session</span>
+            </button>
+          </div>
+        </section>
+
+      </main>
+
+      <!-- Bottom Navigation Bar (Hidden on Login Screen) -->
+      <nav id="global-nav-bar" class="hidden mobile-nav-bar" aria-label="Main Navigation">
+        <!-- Dashboard -->
+        <button class="nav-item active" data-nav="dashboard" onclick="navigateTo('dashboard')">
+          <div class="nav-icon-container">
+            <span class="material-symbols-outlined text-[20px]">dashboard</span>
+          </div>
+          <span data-i18n="nav_dashboard">Dashboard</span>
+        </button>
+
+        <!-- Zones -->
+        <button class="nav-item" data-nav="farm-zones" onclick="navigateTo('farm-zones')">
+          <div class="nav-icon-container">
+            <span class="material-symbols-outlined text-[20px]">grid_view</span>
+          </div>
+          <span data-i18n="nav_zones">Zones</span>
+        </button>
+
+        <!-- Crop AI Scanner (Center Button) -->
+        <button class="nav-item center-ai" data-nav="crop-ai-scanner" onclick="navigateTo('crop-ai-scanner')">
+          <div class="ai-center-button">
+            <span class="material-symbols-outlined text-[22px]">document_scanner</span>
+          </div>
+          <span class="mt-0.5" data-i18n="nav_crop_ai">Crop AI</span>
+        </button>
+
+        <!-- Irrigation -->
+        <button class="nav-item" data-nav="irrigation-telemetry" onclick="navigateTo('irrigation-telemetry')">
+          <div class="nav-icon-container">
+            <span class="material-symbols-outlined text-[20px]">water_drop</span>
+          </div>
+          <span data-i18n="nav_irrigation">Irrigation</span>
+        </button>
+
+        <!-- More -->
+        <button class="nav-item" data-nav="agri-settings" onclick="navigateTo('agri-settings')">
+          <div class="nav-icon-container">
+            <span class="material-symbols-outlined text-[20px]">tune</span>
+          </div>
+          <span data-i18n="nav_more">Settings</span>
+        </button>
+      </nav>
+
+      <!-- Home Indicator -->
+      <div class="phone-home-indicator"></div>
+
+      <!-- Global Feedback Toast Notification -->
+      <div class="farm-toast" id="global-toast">
+        <div class="flex items-center gap-2 min-w-0">
+          <span class="material-symbols-outlined text-[20px] text-secondary-container" id="toast-icon">check_circle</span>
+          <span class="text-xs font-semibold truncate" id="toast-text">Command broadcasted</span>
+        </div>
+        <span class="text-[10px] font-mono uppercase bg-emerald-900/60 px-1.5 py-0.5 rounded text-emerald-200">ACK</span>
+      </div>
+
+      <!-- Emergency Cutoff Confirmation Modal -->
+      <div class="emergency-modal" id="emergency-modal">
+        <div class="w-full max-w-xs bg-surface-container-lowest rounded-2xl p-4 shadow-2xl border border-red-400 flex flex-col gap-3 text-center">
+          <div class="w-12 h-12 rounded-full bg-error-container text-on-error-container flex items-center justify-center mx-auto">
+            <span class="material-symbols-outlined text-[28px]">power_settings_new</span>
+          </div>
+          <div>
+            <h3 class="font-extrabold text-base text-error">EMERGENCY SAFETY STOP</h3>
+            <p class="text-xs text-on-surface-variant mt-1">
+              Cut power immediately to all motors, submersible pumps, and solenoid valves across all 4 field zones?
+            </p>
+          </div>
+          <div class="grid grid-cols-2 gap-2 pt-1">
+            <button class="h-10 rounded-xl bg-surface-container text-on-surface text-xs font-bold" onclick="hideEmergencyModal()">Cancel</button>
+            <button class="h-10 rounded-xl bg-error text-white text-xs font-extrabold shadow-md active:scale-95" onclick="executeEmergencyStop()">CUT POWER</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Zone Details Bottom Sheet Modal -->
+      <div class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 hidden flex items-end justify-center p-0" id="zone-details-sheet">
+        <div class="bg-surface-container-lowest w-full rounded-t-3xl shadow-2xl p-4 flex flex-col gap-3 max-h-[80vh] overflow-y-auto border-t border-outline-variant/40">
+          <div class="w-10 h-1 bg-outline rounded-full mx-auto opacity-40"></div>
+          <div class="flex items-start justify-between">
+            <div class="flex items-center gap-2">
+              <div class="w-9 h-9 rounded-xl bg-primary-container text-on-primary flex items-center justify-center">
+                <span class="material-symbols-outlined text-[20px]">potted_plant</span>
+              </div>
+              <div>
+                <h4 class="font-bold text-base text-primary" id="modal-zone-title">Zone Details</h4>
+                <span class="text-xs text-on-surface-variant font-mono" id="modal-zone-subtitle">Node Telemetry</span>
+              </div>
+            </div>
+            <button class="w-7 h-7 rounded-full bg-surface-container flex items-center justify-center" onclick="closeZoneModal()">
+              <span class="material-symbols-outlined text-[18px]">close</span>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 my-1">
+            <div class="bg-surface-container-low p-2.5 rounded-xl">
+              <span class="text-[10px] text-on-surface-variant">Soil Moisture</span>
+              <span class="font-extrabold text-base text-primary block mt-0.5" id="modal-zone-moisture">44%</span>
+            </div>
+            <div class="bg-surface-container-low p-2.5 rounded-xl">
+              <span class="text-[10px] text-on-surface-variant">Soil Temp</span>
+              <span class="font-extrabold text-base text-on-surface block mt-0.5" id="modal-zone-temp">32.1°C</span>
+            </div>
+          </div>
+
+          <div class="bg-surface-container p-2.5 rounded-xl text-xs">
+            <span class="font-bold text-primary block">Micro-Climate Advisory</span>
+            <p class="text-[11px] text-on-surface-variant mt-0.5" id="modal-zone-advice">
+              Sensor readings optimal for photosynthetic growth.
+            </p>
+          </div>
+
+          <div class="flex flex-col gap-2 pt-1">
+            <button class="w-full h-10 bg-primary text-on-primary rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow" onclick="triggerZoneAction('irrigate')">
+              <span class="material-symbols-outlined text-[16px]">water_drop</span>
+              <span>Trigger Smart Drip (30m)</span>
+            </button>
+            <button class="w-full h-10 bg-surface-container-high text-on-surface rounded-xl font-bold text-xs flex items-center justify-center gap-1.5" onclick="triggerZoneAction('scan')">
+              <span class="material-symbols-outlined text-[16px] text-primary">document_scanner</span>
+              <span>Recon Leaf Scan</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Main JavaScript App Logic -->
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
